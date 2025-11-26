@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация</title>
+</head>
+<body>
+<h2>Регистрация</h2>
+
+<div th:if="${error}" style="color:red;">
+    <p th:text="#{${error}}"></p>
+</div>
+
+<form th:action="@{/registration}" th:object="${user}" method="post">
+    <div>
+    <label>Имя:
+        <input type="text" th:field="*{firstName}" required>
+    </label>
+        <p th:if="${#fields.hasErrors('firstName')}"
+           th:errors="*{firstName}"></p>
+    </div>
+
+    <div>
+    <label>Фамилия:
+        <input type="text" th:field="*{lastName}" required>
+    </label>
+        <p th:if="${#fields.hasErrors('lastName')}"
+           th:errors="*{lastName}"></p>
+    </div>
+
+    <div>
+    <label>Email:
+        <input type="email" th:field="*{email}" required>
+    </label>
+        <p th:if="${#fields.hasErrors('email')}"
+           th:errors="*{email}"></p>
+    </div>
+
+    <div>
+    <label>Пароль:
+        <input type="password" th:field="*{password}" required>
+    </label>
+        <p th:if="${#fields.hasErrors('password')}"
+           th:errors="*{password}"></p>
+    </div>
+
+    <div>
+    <label>Повторите пароль:
+        <input type="password" th:field="*{confirmPassword}" required>
+    </label>
+        <p th:if="${#fields.hasErrors('confirmPassword')}"
+           th:errors="*{confirmPassword}"></p>
+    </div>
+
+    <div>
+    <label>Роль:
+        <select th:field="*{role}" required>
+            <option th:each="r : ${T(ru.khamitova.TestSystemNaumen.entity.enums.Role).values()}"
+                    th:value="${r}"
+                    th:text="${r}">
+            </option>
+        </select>
+    </label>
+        <p th:if="${#fields.hasErrors('role')}"
+           th:errors="*{role}"></p>
+    </div>
+
+    <button type="submit">Зарегистрироваться</button>
+</form>
+
+<div>
+    <p>Уже есть аккаунт? <a th:href="@{/login}">Войти</a></p>
+</div>
+
+</body>
+</html>
