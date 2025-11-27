@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Тема</title>
+</head>
+<body>
+<h2 th:text="${topic.id} != null ? 'Редактирование темы' : 'Создание темы'"></h2>
+
+<form th:action="${topic.id} != null ?
+    @{/admin/topics/edit/{id}(id=${topic.id})} :
+    @{/admin/topics/create}"
+      th:object="${topic}" method="post">
+
+    <div>
+        <label>Название:
+            <input type="text" th:field="*{name}">
+        </label>
+        <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+    </div>
+
+    <div>
+        <label>Описание:
+            <textarea th:field="*{description}"></textarea>
+        </label>
+    </div>
+
+    <button type="submit">Сохранить</button>
+</form>
+
+<a th:href="@{/topics}">Назад к списку</a>
+
+</body>
+</html>

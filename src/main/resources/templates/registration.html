@@ -53,14 +53,15 @@
     </div>
 
     <div>
-    <label>Роль:
-        <select th:field="*{role}" required>
-            <option th:each="r : ${T(ru.khamitova.TestSystemNaumen.entity.enums.Role).values()}"
-                    th:value="${r}"
-                    th:text="${r}">
-            </option>
-        </select>
-    </label>
+        <label>Роль:
+            <select th:field="*{role}" required>
+                <option th:each="r : ${T(ru.khamitova.TestSystemNaumen.entity.enums.Role).values()}"
+                        th:if="${r.name() != 'ADMIN'}"
+                        th:value="${r}"
+                        th:text="${r}">
+                </option>
+            </select>
+        </label>
         <p th:if="${#fields.hasErrors('role')}"
            th:errors="*{role}"></p>
     </div>

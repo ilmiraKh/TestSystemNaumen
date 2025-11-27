@@ -2,8 +2,6 @@ package ru.khamitova.TestSystemNaumen.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,8 +10,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.khamitova.TestSystemNaumen.dto.UserRegistrationDto;
-import ru.khamitova.TestSystemNaumen.entity.User;
-import ru.khamitova.TestSystemNaumen.exception.UserAlreadyExistsException;
+import ru.khamitova.TestSystemNaumen.exception.EntityAlreadyExistsException;
+import ru.khamitova.TestSystemNaumen.exception.InvalidRoleException;
 import ru.khamitova.TestSystemNaumen.service.UserService;
 
 @Controller
@@ -42,8 +40,11 @@ public class RegistrationViewController {
         try{
             userService.register(dto);
 
-        } catch (UserAlreadyExistsException ex) {
-            bindingResult.rejectValue("email", "user.exists");
+        } catch (EntityAlreadyExistsException ex) {
+            bindingResult.rejectValue("email", ex.getMessage());
+            return "registration";
+        }  catch (InvalidRoleException ex) {
+            bindingResult.rejectValue("role", ex.getMessage());
             return "registration";
         }
 
