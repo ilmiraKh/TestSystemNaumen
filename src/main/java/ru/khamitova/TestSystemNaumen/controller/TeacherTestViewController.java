@@ -57,18 +57,18 @@ public class TeacherTestViewController {
 
     @PostMapping("/create/{topicId}")
     public String createTestPost(@Valid @ModelAttribute("test") Test test,
-                           @PathVariable Long topicId,
-                           BindingResult bindingResult,
-                           Principal principal) {
-        if (bindingResult.hasErrors()) {
-            return "test_form";
-        }
-
+                                 BindingResult bindingResult,
+                                 @PathVariable Long topicId,
+                                 Principal principal) {
         User teacher = userService.findByEmail(principal.getName());
         Topic topic = topicService.findById(topicId);
 
         test.setTopic(topic);
         test.setUser(teacher);
+
+        if (bindingResult.hasErrors()) {
+            return "test_form";
+        }
 
         testService.create(test);
 
@@ -89,13 +89,16 @@ public class TeacherTestViewController {
                              @Valid @ModelAttribute("test") Test test,
                              BindingResult bindingResult,
                              Principal principal) {
+        User teacher = userService.findByEmail(principal.getName());
+        Test existing = testService.findByIdAndUser(id, teacher);
+
         if (bindingResult.hasErrors()) {
+            test.setTopic(existing.getTopic());
+            test.setUser(teacher);
             return "test_form";
         }
 
-        User teacher = userService.findByEmail(principal.getName());
         test.setId(id);
-
         testService.update(test, teacher);
 
         return "redirect:/teacher/tests";
