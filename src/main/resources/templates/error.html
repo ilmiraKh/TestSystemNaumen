@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Упс :(</title>
+</head>
+<body>
+<h1>Произошла ошибка</h1>
+<p>Что-то пошло не так.</p>
+
+<p th:if="${status}">
+    Код ошибки: <b th:text="${status}"></b>
+</p>
+
+<p th:if="${error}">
+    <span th:text="${error}"></span>
+</p>
+</body>
+</html>

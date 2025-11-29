@@ -1,6 +1,8 @@
 package ru.khamitova.TestSystemNaumen.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -17,9 +19,12 @@ public class Test {
     private Long id;
 
     @Column(nullable = false)
+    @NotBlank(message = "{test.title.notBlank}")
+    @Size(min = 3, max = 255, message = "{test.title.size}")
     private String title;
 
     @Column(columnDefinition = "TEXT")
+    @Size(max = 5000, message = "{test.description.size}")
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${test.id != null} ? ${test.title} : 'Новый тест'">Тест</title>
+</head>
+<body>
+
+<h2 th:text="${test.id == null} ? 'Создание теста' : 'Редактирование теста'"></h2>
+
+<p><b>Тема:</b> <span th:text="${test.topic.name}"></span></p>
+
+<form th:action="@{${test.id == null}
+                       ? '/teacher/tests/create/' + ${test.topic.id}
+                       : '/teacher/tests/edit/' + ${test.id}}"
+      method="post"
+      th:object="${test}">
+
+    <div>
+    <label>Название:
+        <input type="text" th:field="*{title}">
+    </label>
+    <p th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></p>
+    </div>
+
+    <div>
+    <label>Описание:
+        <textarea th:field="*{description}"></textarea>
+    </label>
+    </div>
+
+    <button type="submit">Сохранить</button>
+</form>
+
+<a th:href="@{/teacher/topics}">Назад</a>
+
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Мои тесты</title>
+</head>
+<body>
+
+<h2>Созданные тесты</h2>
+
+<div th:if="${#lists.isEmpty(tests)}">
+    Вы ещё не создали ни одного теста.
+</div>
+
+<table th:if="${!#lists.isEmpty(tests)}" border="1" cellpadding="5" cellspacing="0">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Название</th>
+        <th>Описание</th>
+        <th>Тема</th>
+        <th>Действия</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="test : ${tests}">
+        <td th:text="${test.id}"></td>
+        <td th:text="${test.title}"></td>
+        <td th:text="${test.description}"></td>
+        <td th:text="${test.topic.name}"></td>
+        <td>
+            <a th:href="@{|/teacher/tests/edit/${test.id}|}">Редактировать</a>
+            <form th:action="@{|/teacher/tests/delete/${test.id}|}" method="post" style="display:inline;">
+                <button type="submit" onclick="return confirm('Удалить тест?');">Удалить</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<hr>
+
+<a href="/topics">Назад к темам</a>
+
+</body>
+</html>

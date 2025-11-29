@@ -1,5 +1,6 @@
 package ru.khamitova.TestSystemNaumen.controller;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -9,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.khamitova.TestSystemNaumen.entity.Topic;
 import ru.khamitova.TestSystemNaumen.exception.EntityAlreadyExistsException;
-import ru.khamitova.TestSystemNaumen.exception.EntityNotFoundException;
 import ru.khamitova.TestSystemNaumen.service.TopicService;
 
 @Controller
@@ -46,13 +46,8 @@ public class AdminViewController {
 
     @GetMapping("/topics/edit/{id}")
     public String editTopic(@PathVariable Long id, Model model) {
-        try {
-            Topic topic = topicService.findById(id);
-            model.addAttribute("topic", topic);
-        } catch (EntityNotFoundException ex) {
-            model.addAttribute("error", ex.getMessage());
-            return "redirect:/topics";
-        }
+        Topic topic = topicService.findById(id);
+        model.addAttribute("topic", topic);
         return "topic_form";
     }
 
@@ -73,9 +68,6 @@ public class AdminViewController {
         } catch (EntityAlreadyExistsException ex) {
             result.rejectValue("name", ex.getMessage());
             return "topic_form";
-        } catch (EntityNotFoundException ex) {
-            model.addAttribute("error", ex.getMessage());
-            return "topic_form";
         }
 
         return "redirect:/topics";
@@ -83,11 +75,7 @@ public class AdminViewController {
 
     @PostMapping("/topics/delete/{id}")
     public String deleteTopic(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        try {
-            topicService.deleteById(id);
-        } catch (EntityNotFoundException ex) {
-            redirectAttributes.addFlashAttribute("error", "topic.notFound");
-        }
+        topicService.deleteById(id);
         return "redirect:/topics";
     }
 }

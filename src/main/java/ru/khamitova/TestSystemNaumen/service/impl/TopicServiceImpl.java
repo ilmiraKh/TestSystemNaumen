@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.khamitova.TestSystemNaumen.entity.Topic;
 import ru.khamitova.TestSystemNaumen.exception.EntityAlreadyExistsException;
-import ru.khamitova.TestSystemNaumen.exception.EntityNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import ru.khamitova.TestSystemNaumen.repository.TopicRepository;
 import ru.khamitova.TestSystemNaumen.service.TopicService;
 
