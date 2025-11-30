@@ -45,6 +45,7 @@ public class TestServiceImpl implements TestService {
 
         existing.setTitle(test.getTitle());
         existing.setDescription(test.getDescription());
+        existing.setPublished(test.getPublished());
 
         return testRepository.save(existing);
     }

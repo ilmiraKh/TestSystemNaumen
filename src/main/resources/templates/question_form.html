@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${question.id != null} ? 'Редактирование вопроса' : 'Создание вопроса'">Вопрос</title>
+
+    <script>
+        function updateVisibility() {
+            const type = document.getElementById("typeSelector").value;
+            document.getElementById("optionsBlock").style.display = (type === 'CHOICE') ? 'block' : 'none';
+            document.getElementById("openBlock").style.display = (type === 'OPEN') ? 'block' : 'none';
+        }
+
+        function addOption() {
+            const container = document.getElementById("optionsContainer");
+
+            const div = document.createElement("div");
+            div.classList.add("option-item");
+
+            div.innerHTML = `
+            <label>
+                <input type="checkbox" name="options[].isCorrect">
+                <input type="text" name="options[].text" placeholder="Текст варианта">
+                <button type="button" onclick="removeOption(this)">Удалить</button>
+            </label>
+        `;
+
+            container.appendChild(div);
+            normalizeOptionIndexes();
+        }
+
+        function removeOption(button) {
+            const item = button.closest(".option-item");
+            item.remove();
+            normalizeOptionIndexes();
+        }
+
+        function normalizeOptionIndexes() {
+            const container = document.getElementById("optionsContainer");
+            const items = container.querySelectorAll(".option-item");
+
+            items.forEach((item, index) => {
+                const check = item.querySelector('input[type="checkbox"]');
+                const text = item.querySelector('input[type="text"]');
+
+                check.name = `options[${index}].isCorrect`;
+                text.name = `options[${index}].text`;
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", updateVisibility);
+    </script>
+
+</head>
+<body>
+
+<h2 th:text="${question.id != null} ? 'Редактирование вопроса' : 'Создание вопроса'"></h2>
+
+<form th:action="@{${question.id != null}
+        ? '/teacher/tests/' + ${question.test.id} + '/questions/edit/' + ${question.id}
+        : '/teacher/tests/' + ${question.test.id} + '/questions/create'}"
+      th:object="${question}"
+      method="post">
+
+    <div>
+        <label>Текст вопроса:
+            <textarea th:field="*{text}" required></textarea>
+        </label>
+        <p th:if="${#fields.hasErrors('text')}" th:errors="*{text}"></p>
+    </div>
+
+    <div>
+        <label>Тип вопроса:
+            <select id="typeSelector" th:field="*{type}" onchange="updateVisibility()" required>
+                <option value="" disabled selected>Выберите тип</option>
+                <option value="CHOICE">С выбором ответов</option>
+                <option value="OPEN">Открытый ответ</option>
+            </select>
+        </label>
+        <p th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></p>
+    </div>
+
+    <div>
+        <label>Баллы:
+            <input type="number" th:field="*{points}" min="1" required>
+        </label>
+        <p th:if="${#fields.hasErrors('points')}" th:errors="*{points}"></p>
+    </div>
+
+    <div id="optionsBlock" style="display:none;">
+        <h3>Варианты ответов</h3>
+
+        <div id="optionsContainer">
+
+            <div th:each="option, iterStat : ${question.options}" class="option-item">
+                <label>
+                    <input type="checkbox" th:field="*{options[__${iterStat.index}__].isCorrect}">
+                    <input type="text" th:field="*{options[__${iterStat.index}__].text}" placeholder="Текст варианта">
+                    <button type="button" onclick="removeOption(this)">Удалить</button>
+                </label>
+            </div>
+
+        </div>
+        <p th:if="${#fields.hasErrors('options')}" th:errors="*{options}"></p>
+
+        <button type="button" onclick="addOption()">Добавить вариант</button>
+    </div>
+
+
+    <div id="openBlock" style="display:none;">
+        <h3>Открытый вопрос</h3>
+
+        <label>Правильный ответ (необязательно, оставьте поле пустым, если вопрос требует ручной проверки):
+            <input type="text" th:field="*{correctAnswer}">
+        </label>
+    </div>
+
+    <br><br>
+    <button type="submit">Сохранить</button>
+</form>
+
+<a th:href="@{|/teacher/tests/${question.test.id}/questions|}">Назад</a>
+
+</body>
+</html>

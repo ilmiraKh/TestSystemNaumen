@@ -101,7 +101,7 @@ public class TeacherTestViewController {
         test.setId(id);
         testService.update(test, teacher);
 
-        return "redirect:/teacher/tests";
+        return "redirect:/teacher/tests/" + id + "/questions";
     }
 
     @PostMapping("/delete/{id}")
@@ -112,6 +112,22 @@ public class TeacherTestViewController {
         testService.deleteByIdAndUser(id, teacher);
 
         return "redirect:/teacher/tests";
+    }
+
+    @PostMapping("/publish/{id}")
+    public String publish(@PathVariable Long id,
+                         Principal principal) {
+        User teacher = userService.findByEmail(principal.getName());
+        Test test = testService.findByIdAndUser(id, teacher);
+
+        if (test.getPublished()) {
+            throw new IllegalStateException("test.alreadyPublished");
+        }
+
+        test.setPublished(true);
+        testService.update(test, teacher);
+
+        return "redirect:/teacher/tests/" + id + "/questions";
     }
 }
 

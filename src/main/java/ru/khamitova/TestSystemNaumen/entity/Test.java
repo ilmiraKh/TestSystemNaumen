@@ -35,6 +35,9 @@ public class Test {
     @JoinColumn(name = "topic_id", nullable = false)
     private Topic topic;
 
+    @Column(nullable = false)
+    private Boolean published = false;
+
     @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, orphanRemoval = true,
             fetch = FetchType.LAZY)
     private List<Question> questions;

@@ -37,4 +37,24 @@ public class ExceptionControllerAdvice {
         model.addAttribute("error", resolvedMessage);
         return "error";
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public String handleIllegalState(IllegalStateException ex,
+                                     Model model,
+                                     HttpServletResponse response,
+                                     Locale locale) {
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+        String resolvedMessage = messageSource.getMessage(
+                ex.getMessage(),
+                new Object[]{},
+                ex.getMessage(),
+                locale
+        );
+
+        model.addAttribute("status", 400);
+        model.addAttribute("error", resolvedMessage);
+        return "error";
+    }
+
 }

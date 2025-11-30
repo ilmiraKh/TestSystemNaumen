@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${test.title}">Тест</title>
+</head>
+<body>
+
+<h2 th:text="'Тест: ' + ${test.title}"></h2>
+
+<p><b>Описание:</b> <span th:text="${test.description}"></span></p>
+
+<div th:if="${test.published}">
+    <p>Тест опубликован</p>
+</div>
+
+<a th:href="@{|/teacher/tests/edit/${test.id}|}"
+   th:if="${!test.published}">Редактировать метаданные</a>
+
+<hr>
+
+<h3>Вопросы</h3>
+
+<div th:if="${#lists.isEmpty(questions)}">
+    <p>Вопросов пока нет.</p>
+    <hr>
+</div>
+
+<div th:each="q : ${questions}">
+    <h4 th:text="${q.text}"></h4>
+
+    <p>Баллы: <span th:text="${q.points}"></span></p>
+
+    <ul th:if="${q.type.name() == 'CHOICE'}">
+        <li th:each="opt : ${q.options}">
+            <span th:text="${opt.text}"></span>
+            <b th:if="${opt.isCorrect}" style="color: green"> - правильный</b>
+        </li>
+    </ul>
+
+    <div th:if="${q.type.name() == 'OPEN'}">
+        <p><b>Открытый вопрос</b></p>
+        <p th:if="${q.manualCheckRequired}">Требует ручной проверки</p>
+        <p th:if="${q.correctAnswer != null and q.correctAnswer != ''}" style="color: green">
+            <b>Правильный ответ: <span th:text="${q.correctAnswer}"></span></b>
+        </p>
+    </div>
+
+    <div th:if="${!test.published}">
+        <a th:href="@{'/teacher/tests/' + ${test.id} + '/questions/edit/' + ${q.id}}">
+            Редактировать
+        </a>
+
+        <form th:action="@{'/teacher/tests/' + ${test.id} + '/questions/delete/' + ${q.id}}"
+              method="post"
+              style="display:inline">
+            <button type="submit" onclick="return confirm('Удалить вопрос?')">Удалить</button>
+        </form>
+    </div>
+
+    <hr>
+</div>
+
+<div th:if="${!test.published}">
+    <a th:href="@{'/teacher/tests/' + ${test.id} + '/questions/create'}">
+        Добавить вопрос
+    </a>
+</div>
+
+<div th:if="${!test.published}">
+    <form th:action="@{'/teacher/tests/publish/' + ${test.id}}" method="post">
+        <button type="submit" onclick="return confirm('Опубликовать тест? После публикации редактирование вопросов будет недоступно.')">
+            Опубликовать тест
+        </button>
+    </form>
+</div>
+
+<br>
+<a th:href="@{'/teacher/tests'}">Назад к тестам</a>
+
+</body>
+</html>

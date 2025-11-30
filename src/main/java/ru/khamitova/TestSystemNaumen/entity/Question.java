@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import ru.khamitova.TestSystemNaumen.entity.enums.QuestionType;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -25,8 +27,8 @@ public class Question {
     @Column(nullable = false)
     private Integer points;
 
-    @Column(name = "order_index")
-    private Integer orderIndex;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "manual_check_required", nullable = false)
     private Boolean manualCheckRequired;
@@ -40,5 +42,5 @@ public class Question {
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true,
             fetch = FetchType.LAZY)
-    private List<Option> options;
+    private List<Option> options = new ArrayList<>();
 }
