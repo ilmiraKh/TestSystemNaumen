@@ -1,5 +1,6 @@
 package ru.khamitova.TestSystemNaumen.service;
 
+import org.springframework.data.domain.Page;
 import ru.khamitova.TestSystemNaumen.entity.Test;
 import ru.khamitova.TestSystemNaumen.entity.User;
 
@@ -11,4 +12,5 @@ public interface TestService {
     Test create(Test test);
     Test update(Test test, User user);
     void deleteByIdAndUser(Long id, User user);
+    Page<Test> getPageByFilters(String search, Long topicId, String topicName, int page, int size);
 }

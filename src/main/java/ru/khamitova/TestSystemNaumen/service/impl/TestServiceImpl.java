@@ -1,6 +1,10 @@
 package ru.khamitova.TestSystemNaumen.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.khamitova.TestSystemNaumen.entity.Test;
 import ru.khamitova.TestSystemNaumen.entity.User;
@@ -56,5 +60,25 @@ public class TestServiceImpl implements TestService {
                 .orElseThrow(() -> new EntityNotFoundException("test.notFound"));
 
         testRepository.delete(test);
+    }
+
+    @Override
+    public Page<Test> getPageByFilters(String search, Long topicId, String topicName, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("title"));
+        return testRepository.findByFilters(topicId, topicName, search, pageable);
+
+//        if (topicId != null) {
+//            return testRepository.findByTopicIdAndTitleContainingIgnoreCaseAndPublishedTrue(topicId, search != null ? search : "", pageable);
+//        }
+//
+//        if (topicName != null && !topicName.isBlank()) {
+//            return testRepository.findByTopicNameContainingIgnoreCaseAndTitleContainingIgnoreCaseAndPublishedTrue(topicName, search != null ? search : "", pageable);
+//        }
+//
+//        if (search != null && !search.isBlank()) {
+//            return testRepository.findByTitleContainingIgnoreCaseAndPublishedTrue(search, pageable);
+//        }
+//
+//        return testRepository.findByPublishedTrue(pageable);
     }
 }

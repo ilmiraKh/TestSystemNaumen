@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Тесты</title>
+</head>
+<body>
+
+<h2>Список тестов</h2>
+
+<div th:if="${topicId != null and topicName != null and !#strings.isEmpty(topicName)}">
+    Вы просматриваете только тесты по теме <strong th:text="${topicName}"></strong>.
+    <div>
+    <a th:if="${search != null}" th:href="@{|/tests?search=${search}|}">
+        Очистить поиск по теме и перейти ко всем тестам
+    </a>
+    <a th:if="${search == null}" th:href="@{|/tests|}">
+        Очистить поиск по теме и перейти ко всем тестам
+    </a>
+    </div>
+</div>
+<form method="get" action="#">
+    <input type="text" name="search" placeholder="Поиск по названию теста" th:value="${search}">
+    <input type="text" name="topicName" placeholder="Поиск по теме"
+           th:value="${topicName}" th:if="${topicId == null}">
+    <input type="hidden" name="topicId" th:if="${topicId != null}" th:value="${topicId}">
+
+    <button type="submit">Найти</button>
+
+</form>
+
+<div th:if="${#lists.isEmpty(tests)}">
+    <p>Тесты не найдены.</p>
+</div>
+
+<div th:each="test : ${tests}">
+
+    <h3 th:text="${test.title}"></h3>
+
+    <p>
+        Тема: <a th:href="@{|/tests?topicId=${test.topic.id}|}" th:text="${test.topic.name}"></a>
+    </p>
+
+    <p th:text="${test.description != null && !#strings.isEmpty(test.description)
+                ? test.description : 'нет описания'}"></p>
+
+    <div sec:authorize="hasRole('TEACHER')">
+
+        <form th:action="@{|/teacher/tests/delete/${test.id}|}" method="post" style="display:inline;">
+            <button type="submit"
+                    onclick="return confirm('Удалить тест?');">
+                Удалить
+            </button>
+        </form>
+    </div>
+</div>
+
+<div th:if="${totalPages == 1}">
+    <span>Страница 1 из 1</span>
+</div>
+
+<div th:if="${totalPages > 1}">
+
+    <a th:if="${currentPage != 1}"
+       th:href="@{|/tests?page=1&search=${search}&topicId=${topicId}&topicName=${topicName}|}">1</a>
+    <span th:if="${currentPage == 1}">1</span>
+
+    <span th:if="${currentPage > 4}">...</span>
+
+    <span th:each="i : ${#numbers.sequence(currentPage-2, currentPage-1)}"
+          th:if="${i > 1}">
+        <a th:if="${i != currentPage}"
+           th:href="@{|/tests?page=${i}&search=${search}&topicId=${topicId}&topicName=${topicName}|}"
+           th:text="${i}"></a>
+    </span>
+
+    <span th:if="${currentPage != 1 and currentPage != totalPages}"
+          th:text="${currentPage}"></span>
+
+    <span th:each="i : ${#numbers.sequence(currentPage+1, currentPage+2)}"
+          th:if="${i < totalPages}">
+        <a th:href="@{|/tests?page=${i}&search=${search}&topicId=${topicId}&topicName=${topicName}|}"
+           th:text="${i}"></a>
+    </span>
+
+    <span th:if="${currentPage < totalPages-3}">...</span>
+
+    <a th:if="${currentPage != totalPages}"
+       th:href="@{|/tests?page=${totalPages}&search=${search}&topicId=${topicId}&topicName=${topicName}|}"
+       th:text="${totalPages}"></a>
+    <span th:if="${currentPage == totalPages}"
+          th:text="${totalPages}"></span>
+</div>
+
+</body>
+</html>

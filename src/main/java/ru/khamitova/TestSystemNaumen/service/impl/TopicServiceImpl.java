@@ -1,6 +1,10 @@
 package ru.khamitova.TestSystemNaumen.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.khamitova.TestSystemNaumen.entity.Topic;
 import ru.khamitova.TestSystemNaumen.exception.EntityAlreadyExistsException;
@@ -18,9 +22,16 @@ public class TopicServiceImpl implements TopicService {
     public TopicServiceImpl(TopicRepository topicRepository) {
         this.topicRepository = topicRepository;
     }
+
     @Override
-    public List<Topic> getAll() {
-        return topicRepository.findAll();
+    public Page<Topic> getPageByName(String name, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("name"));
+
+        if (name == null || name.isBlank()) {
+            return topicRepository.findAll(pageable);
+        }
+
+        return topicRepository.findByNameContainingIgnoreCase(name, pageable);
     }
 
     @Override
