@@ -73,7 +73,7 @@ public class AdminViewController {
     }
 
     @PostMapping("/topics/delete/{id}")
-    public String deleteTopic(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String deleteTopic(@PathVariable Long id) {
         topicService.deleteById(id);
         return "redirect:/topics";
     }

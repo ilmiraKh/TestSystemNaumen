@@ -138,8 +138,7 @@ public class QuestionServiceImpl implements QuestionService {
                 throw new IllegalArgumentException("question.atLeastOneOptionRequired");
             }
 
-            boolean hasCorrect = validOptions.stream()
-                    .anyMatch(o -> Boolean.TRUE.equals(o.getIsCorrect()));
+            boolean hasCorrect = validOptions.stream().anyMatch(Option::getIsCorrect);
 
             if (!hasCorrect) {
                 throw new IllegalArgumentException("question.atLeastOneCorrectRequired");

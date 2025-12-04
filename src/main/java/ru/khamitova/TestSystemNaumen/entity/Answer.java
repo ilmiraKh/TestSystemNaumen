@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "answers")
 @Getter @Setter
@@ -25,4 +27,7 @@ public class Answer {
 
     @Column(name = "points_awarded")
     private Double pointsAwarded;
+
+    @Transient
+    private Set<Long> selectedOptionIds;
 }

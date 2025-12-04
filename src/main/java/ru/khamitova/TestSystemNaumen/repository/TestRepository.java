@@ -19,8 +19,8 @@ public interface TestRepository extends JpaRepository<Test, Long> {
     SELECT t FROM Test t
     WHERE t.published = true
       AND (:topicId IS NULL OR t.topic.id = :topicId)
-      AND (:topicName IS NULL OR LOWER(t.topic.name) LIKE LOWER(CONCAT('%', :topicName, '%')))
-      AND (:search IS NULL OR LOWER(t.title) LIKE LOWER(CONCAT('%', :search, '%')))
+      AND (:topicName IS NULL OR :topicName = '' OR LOWER(t.topic.name) LIKE CONCAT('%', LOWER(:topicName), '%'))
+      AND (:search IS NULL OR :search = '' OR LOWER(t.title) LIKE CONCAT('%', LOWER(:search), '%'))
     ORDER BY t.title
     """)
     Page<Test> findByFilters(

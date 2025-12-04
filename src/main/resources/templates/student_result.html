@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Результат: ' + ${result.test.title}">Результат теста</title>
+    <style>
+        .correct { color: green; font-weight: bold; }
+        .incorrect { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+<div th:if="${message}" class="alert alert-info" th:text="#{${message}}"></div>
+
+<h2 th:text="'Результат теста: ' + ${result.test.title}"></h2>
+
+<div th:if="${result.status.name() == 'WAITING'}">
+    <p>Ожидайте проверки теста учителем.</p>
+</div>
+
+<div th:if="${result.status.name() != 'WAITING'}">
+    <p>Баллы: <strong th:text="${#numbers.formatDecimal(result.score, 1, 'POINT', 2, 'POINT')}"></strong></p>
+
+    <h3>Вопросы и ваши ответы</h3>
+    <div th:each="answer : ${result.answers}">
+        <p><strong th:text="${answer.question.text}"></strong></p>
+
+        <div th:if="${answer.question.type.name() == 'OPEN'}">
+            <p>Ваш ответ: <span th:text="${answer.answer}"></span></p>
+            <p th:if="${!answer.question.manualCheckRequired}">
+                Правильный ответ: <span th:text="${answer.question.correctAnswer}"></span>
+            </p>
+            <p th:if="${answer.question.manualCheckRequired}">
+                Вопрос был проверен учителем
+            </p>
+            <p>Начислено баллов: <span th:text="${answer.pointsAwarded != null ? answer.pointsAwarded : 0}"></span></p>
+        </div>
+
+        <div th:if="${answer.question.type.name() == 'CHOICE'}">
+            <ul>
+                <li th:each="option : ${answer.question.options}">
+                    <input type="radio" th:if="${answer.question.correctCount == 1}"
+                           th:checked="${answer.selectedOptionIds.contains(option.id)}"
+                           disabled>
+                    <input type="checkbox" th:if="${answer.question.correctCount > 1}"
+                           th:checked="${answer.selectedOptionIds.contains(option.id)}"
+                           disabled>
+                    <span th:text="${option.text}"
+                          th:classappend="${option.isCorrect} ? ' correct' : ${answer.selectedOptionIds.contains(option.id) ? ' incorrect' : ''}">
+                    </span>
+                </li>
+            </ul>
+
+            <p>Начислено баллов: <span th:text="${answer.pointsAwarded != null ? answer.pointsAwarded : 0}"></span></p>
+        </div>
+
+        <hr>
+    </div>
+</div>
+
+<a th:href="@{/tests}">Назад к списку тестов</a>
+</body>
+</html>

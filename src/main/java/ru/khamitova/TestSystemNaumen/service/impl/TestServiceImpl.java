@@ -34,6 +34,13 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
+    public Test findById(Long id) {
+        Test test = testRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("test.notFound"));
+        if (!test.getPublished()) throw new EntityNotFoundException("test.notFound");
+        return test;
+    }
+
+    @Override
     public Test create(Test test) {
         return testRepository.save(test);
     }
@@ -66,19 +73,5 @@ public class TestServiceImpl implements TestService {
     public Page<Test> getPageByFilters(String search, Long topicId, String topicName, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by("title"));
         return testRepository.findByFilters(topicId, topicName, search, pageable);
-
-//        if (topicId != null) {
-//            return testRepository.findByTopicIdAndTitleContainingIgnoreCaseAndPublishedTrue(topicId, search != null ? search : "", pageable);
-//        }
-//
-//        if (topicName != null && !topicName.isBlank()) {
-//            return testRepository.findByTopicNameContainingIgnoreCaseAndTitleContainingIgnoreCaseAndPublishedTrue(topicName, search != null ? search : "", pageable);
-//        }
-//
-//        if (search != null && !search.isBlank()) {
-//            return testRepository.findByTitleContainingIgnoreCaseAndPublishedTrue(search, pageable);
-//        }
-//
-//        return testRepository.findByPublishedTrue(pageable);
     }
 }

@@ -45,6 +45,10 @@
     <p th:text="${test.description != null && !#strings.isEmpty(test.description)
                 ? test.description : 'нет описания'}"></p>
 
+    <div sec:authorize="hasRole('STUDENT')">
+        <a th:href="@{|/student/tests/take/${test.id}|}">Пройти тест</a>
+    </div>
+
     <div sec:authorize="hasRole('TEACHER')">
 
         <form th:action="@{|/teacher/tests/delete/${test.id}|}" method="post" style="display:inline;">

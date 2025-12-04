@@ -43,4 +43,10 @@ public class Question {
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true,
             fetch = FetchType.LAZY)
     private List<Option> options = new ArrayList<>();
+
+    @Transient
+    public int getCorrectCount() {
+        if (options == null) return 0;
+        return (int) options.stream().filter(Option::getIsCorrect).count();
+    }
 }

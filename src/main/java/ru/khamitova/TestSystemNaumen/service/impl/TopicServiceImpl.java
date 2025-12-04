@@ -12,8 +12,6 @@ import jakarta.persistence.EntityNotFoundException;
 import ru.khamitova.TestSystemNaumen.repository.TopicRepository;
 import ru.khamitova.TestSystemNaumen.service.TopicService;
 
-import java.util.List;
-
 @Service
 public class TopicServiceImpl implements TopicService {
     private final TopicRepository topicRepository;
