@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Проверка теста</title>
+</head>
+<body>
+<h2>Проверка результата студента: <span th:text="${result.user.firstName + ' ' + result.user.lastName}"></span></h2>
+<h3>Тест: <span th:text="${result.test.title}"></span></h3>
+
+<form th:action="@{'/teacher/results/check/' + ${result.id}}" method="post">
+
+    <div th:each="answer : ${answersToCheck}">
+        <hr>
+
+        <h4 th:text="${answer.question.text}"></h4>
+
+        <p><strong>Ответ студента:</strong></p>
+        <pre th:text="${answer.answer}"></pre>
+
+        <label>
+            Баллы (максимум
+            <span th:text="${answer.question.points}"></span>):
+            <input type="number"
+                   step="0.01"
+                   min="0"
+                   th:max="${answer.question.points}"
+                   th:name="${'answer_' + answer.id}"
+                   required>
+        </label>
+    </div>
+
+    <hr>
+
+    <button type="submit">Сохранить</button>
+</form>
+
+</body>
+</html>

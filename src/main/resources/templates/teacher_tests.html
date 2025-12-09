@@ -19,6 +19,7 @@
         <th>Описание</th>
         <th>Тема</th>
         <th>Статус</th>
+        <th>Результаты</th>
         <th>Действия</th>
     </tr>
     </thead>
@@ -31,6 +32,9 @@
         <td th:text="${test.topic.name}"></td>
         <td>
             <span th:text="${test.published} ? 'Опубликован' : 'Черновик'"></span>
+        </td>
+        <td>
+            <a th:href="@{|/teacher/results/test/${test.id}}">Перейти</a>
         </td>
         <td>
             <form th:action="@{|/teacher/tests/delete/${test.id}|}" method="post"

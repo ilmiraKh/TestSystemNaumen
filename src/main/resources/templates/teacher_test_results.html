@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Результаты теста</title>
+</head>
+<body>
+
+<h2>Результаты теста: <span th:text="${test.title}"></span></h2>
+
+<form method="get" th:action="@{'/teacher/results/test/' + ${test.id}}">
+  <label>Фильтр по статусу:</label>
+  <select name="status" onchange="this.form.submit()">
+    <option th:value="''" th:selected="${statusFilter == null or statusFilter == ''}">Все</option>
+    <option th:value="CHECKED" th:selected="${statusFilter == 'CHECKED'}">Проверенные</option>
+    <option th:value="WAITING" th:selected="${statusFilter == 'WAITING'}">Ожидают проверки</option>
+  </select>
+</form>
+
+<hr>
+
+<table>
+  <thead>
+  <tr>
+    <th>Студент</th>
+    <th>Баллы</th>
+    <th>Статус</th>
+    <th>Действия</th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <tr th:each="r : ${results}">
+    <td th:text="${r.user.firstName + ' ' + r.user.lastName}"></td>
+    <td th:text="${r.score}"></td>
+    <td th:text="${r.status}"></td>
+
+    <td>
+      <a th:if="${r.status.name() == 'WAITING'}"
+         th:href="@{'/teacher/results/check/' + ${r.id}}">Проверить</a>
+
+      <a th:if="${r.status.name() == 'CHECKED'}"
+         th:href="@{'/teacher/results/' + ${r.id}}">Просмотр</a>
+    </td>
+  </tr>
+
+  <tr th:if="${results.size() == 0}">
+    <td>Нет результатов</td>
+  </tr>
+
+  </tbody>
+</table>
+
+</body>
+</html>

@@ -40,9 +40,11 @@ public class Question {
     @JoinColumn(name = "test_id", nullable = false)
     private Test test;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true,
-            fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Option> options = new ArrayList<>();
+
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Answer> answers;
 
     @Transient
     public int getCorrectCount() {

@@ -12,10 +12,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ResultRepository extends JpaRepository<Result, Long> {
-    @Query("SELECT r FROM Result r WHERE r.test.user.id = :teacherId AND r.status = :status")
-    List<Result> findResultsForTeacherByStatus(@Param("teacherId") Long teacherId,
-                                               @Param("status") ResultStatus status);
-
+    Optional<Result> findByIdAndTest_User(Long resultId, User teacher);
+    List<Result> findAllByTestAndTest_User(Test test, User teacher);
+    List<Result> findAllByTestAndTest_UserAndStatus(Test test, User teacher, ResultStatus status);
     Optional<Result> findByTestAndUser(Test test, User user);
     Optional<Result> findByIdAndUser(Long id, User user);
 }

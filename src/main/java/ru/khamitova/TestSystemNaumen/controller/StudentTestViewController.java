@@ -14,6 +14,7 @@ import ru.khamitova.TestSystemNaumen.exception.EntityAlreadyExistsException;
 import ru.khamitova.TestSystemNaumen.service.ResultService;
 import ru.khamitova.TestSystemNaumen.service.TestService;
 import ru.khamitova.TestSystemNaumen.service.UserService;
+import ru.khamitova.TestSystemNaumen.util.ResultUtil;
 
 import java.security.Principal;
 import java.util.*;
@@ -76,25 +77,10 @@ public class StudentTestViewController {
         User student = userService.findByEmail(principal.getName());
         Result result = resultService.findByIdAndUser(resultId, student);
 
-        for (Answer answer : result.getAnswers()) {
-            if (answer.getAnswer() != null && !answer.getAnswer().isBlank()) {
-                switch (answer.getQuestion().getType()){
-                    case CHOICE -> {
-                    Set<Long> selectedIds = Arrays.stream(answer.getAnswer().split(","))
-                            .map(Long::valueOf)
-                            .collect(Collectors.toSet());
-                    answer.setSelectedOptionIds(selectedIds);
-                    }
-                    case OPEN ->
-                    answer.setSelectedOptionIds(Collections.emptySet());
-                }
-            } else {
-                answer.setSelectedOptionIds(Collections.emptySet());
-            }
-        }
+        ResultUtil.selectOptions(result);
 
         model.addAttribute("result", result);
-        return "student_result";
+        return "result";
     }
 
 }

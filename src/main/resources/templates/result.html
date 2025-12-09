@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title th:text="'Результат: ' + ${result.test.title}">Результат теста</title>
@@ -12,20 +13,28 @@
 <div th:if="${message}" class="alert alert-info" th:text="#{${message}}"></div>
 
 <h2 th:text="'Результат теста: ' + ${result.test.title}"></h2>
+<div sec:authorize="hasRole('TEACHER')">
+    <p><strong>Студент:</strong>
+        <span th:text="${result.user.firstName + ' ' + result.user.lastName}"></span>
+    </p>
+</div>
 
 <div th:if="${result.status.name() == 'WAITING'}">
-    <p>Ожидайте проверки теста учителем.</p>
+    <p sec:authorize="hasRole('STUDENT')">Ожидайте проверки теста учителем.</p>
+    <p sec:authorize="hasRole('TEACHER')">Проверьте тест, чтобы увидеть полный результат:
+        <a th:href="@{'/teacher/results/check/' + ${result.id}}">проверить</a></p>
 </div>
 
 <div th:if="${result.status.name() != 'WAITING'}">
     <p>Баллы: <strong th:text="${#numbers.formatDecimal(result.score, 1, 'POINT', 2, 'POINT')}"></strong></p>
 
-    <h3>Вопросы и ваши ответы</h3>
+    <h3 sec:authorize="hasRole('STUDENT')">Вопросы и ваши ответы</h3>
+    <h3 sec:authorize="hasRole('TEACHER')">Ответы</h3>
     <div th:each="answer : ${result.answers}">
         <p><strong th:text="${answer.question.text}"></strong></p>
 
         <div th:if="${answer.question.type.name() == 'OPEN'}">
-            <p>Ваш ответ: <span th:text="${answer.answer}"></span></p>
+            <p>Ответ: <span th:text="${answer.answer}"></span></p>
             <p th:if="${!answer.question.manualCheckRequired}">
                 Правильный ответ: <span th:text="${answer.question.correctAnswer}"></span>
             </p>
@@ -39,13 +48,14 @@
             <ul>
                 <li th:each="option : ${answer.question.options}">
                     <input type="radio" th:if="${answer.question.correctCount == 1}"
-                           th:checked="${answer.selectedOptionIds.contains(option.id)}"
+                           th:checked="${answer.selectedOptionIds != null and answer.selectedOptionIds.contains(option.id)}"
                            disabled>
                     <input type="checkbox" th:if="${answer.question.correctCount > 1}"
-                           th:checked="${answer.selectedOptionIds.contains(option.id)}"
+                           th:checked="${answer.selectedOptionIds != null and answer.selectedOptionIds.contains(option.id)}"
                            disabled>
                     <span th:text="${option.text}"
-                          th:classappend="${option.isCorrect} ? ' correct' : ${answer.selectedOptionIds.contains(option.id) ? ' incorrect' : ''}">
+                          th:classappend="${option.isCorrect ? ' correct' :
+                          (answer.selectedOptionIds != null and answer.selectedOptionIds.contains(option.id) ? ' incorrect' : '')}">
                     </span>
                 </li>
             </ul>
@@ -57,6 +67,5 @@
     </div>
 </div>
 
-<a th:href="@{/tests}">Назад к списку тестов</a>
 </body>
 </html>
