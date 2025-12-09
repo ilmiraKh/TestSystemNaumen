@@ -9,7 +9,7 @@ import ru.khamitova.TestSystemNaumen.entity.Result;
 import ru.khamitova.TestSystemNaumen.entity.Test;
 import ru.khamitova.TestSystemNaumen.entity.User;
 import ru.khamitova.TestSystemNaumen.entity.enums.ResultStatus;
-import ru.khamitova.TestSystemNaumen.service.ResultService;
+import ru.khamitova.TestSystemNaumen.service.TeacherResultService;
 import ru.khamitova.TestSystemNaumen.service.TestService;
 import ru.khamitova.TestSystemNaumen.service.UserService;
 import ru.khamitova.TestSystemNaumen.util.ResultUtil;
@@ -22,12 +22,12 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/teacher/results")
 public class TeacherResultViewController {
-    private final ResultService resultService;
+    private final TeacherResultService resultService;
     private final TestService testService;
     private final UserService userService;
 
     @Autowired
-    public TeacherResultViewController(ResultService resultService, TestService testService, UserService userService) {
+    public TeacherResultViewController(TeacherResultService resultService, TestService testService, UserService userService) {
         this.resultService = resultService;
         this.testService = testService;
         this.userService = userService;

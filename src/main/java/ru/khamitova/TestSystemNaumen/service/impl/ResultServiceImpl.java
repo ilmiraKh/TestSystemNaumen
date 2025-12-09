@@ -125,41 +125,13 @@ public class ResultServiceImpl implements ResultService {
     }
 
     @Override
-    public Result getResultForTeacher(Long resultId, User teacher) {
-        return resultRepository.findByIdAndTest_User(resultId, teacher)
-                .orElseThrow(() -> new EntityNotFoundException("result.notFound"));
+    public List<Result> findAllByUserAndStatus(User student, ResultStatus status) {
+        return resultRepository.findAllByUserAndStatus(student, status);
     }
 
     @Override
-    public void manualCheck(Long id, Map<Long, Double> points) {
-        Result result = resultRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("result.notFound"));
-
-        double totalScore = result.getScore() != null ? result.getScore() : 0.0;
-
-        for (Answer answer : result.getAnswers()) {
-            if (answer.getQuestion().getManualCheckRequired()) {
-                Double awardedPoints = points.get(answer.getId());
-                if (awardedPoints != null) {
-                    answer.setPointsAwarded(awardedPoints);
-                    totalScore += awardedPoints;
-                }
-            }
-        }
-
-        result.setScore(totalScore);
-        result.setStatus(ResultStatus.CHECKED);
-        resultRepository.save(result);
-    }
-
-    @Override
-    public List<Result> findAllByTestAndUser(Test test, User teacher) {
-        return resultRepository.findAllByTestAndTest_User(test, teacher);
-    }
-
-    @Override
-    public List<Result> findAllByTestAndUserAndStatus(Test test, User teacher, ResultStatus status) {
-        return resultRepository.findAllByTestAndTest_UserAndStatus(test, teacher, status);
+    public List<Result> findAllByUser(User student) {
+        return resultRepository.findAllByUser(student);
     }
 }
 
