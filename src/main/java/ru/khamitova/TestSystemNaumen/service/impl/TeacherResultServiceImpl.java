@@ -3,6 +3,7 @@ package ru.khamitova.TestSystemNaumen.service.impl;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.khamitova.TestSystemNaumen.entity.Answer;
 import ru.khamitova.TestSystemNaumen.entity.Result;
 import ru.khamitova.TestSystemNaumen.entity.Test;
@@ -30,6 +31,7 @@ public class TeacherResultServiceImpl implements TeacherResultService {
     }
 
     @Override
+    @Transactional
     public void manualCheck(Long id, Map<Long, Double> points) {
         Result result = resultRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("result.notFound"));

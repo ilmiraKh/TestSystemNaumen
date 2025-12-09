@@ -1,55 +1,61 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <title>Результаты теста</title>
-</head>
-<body>
+<head th:replace="~{fragments :: head('Результаты теста')}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments :: header}"></div>
 
-<h2>Результаты теста: <span th:text="${test.title}"></span></h2>
+<main class="container py-4">
+  <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-3">
+    <h2 class="mb-3 mb-md-0">Результаты теста: <span th:text="${test.title}"></span></h2>
+    <form method="get" th:action="@{'/teacher/results/test/' + ${test.id}}" class="d-flex align-items-center gap-2">
+      <label class="form-label mb-0">Статус:</label>
+      <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+        <option th:value="''" th:selected="${statusFilter == null or statusFilter == ''}">Все</option>
+        <option th:value="CHECKED" th:selected="${statusFilter == 'CHECKED'}">Проверенные</option>
+        <option th:value="WAITING" th:selected="${statusFilter == 'WAITING'}">Ожидают проверки</option>
+      </select>
+    </form>
+  </div>
 
-<form method="get" th:action="@{'/teacher/results/test/' + ${test.id}}">
-  <label>Фильтр по статусу:</label>
-  <select name="status" onchange="this.form.submit()">
-    <option th:value="''" th:selected="${statusFilter == null or statusFilter == ''}">Все</option>
-    <option th:value="CHECKED" th:selected="${statusFilter == 'CHECKED'}">Проверенные</option>
-    <option th:value="WAITING" th:selected="${statusFilter == 'WAITING'}">Ожидают проверки</option>
-  </select>
-</form>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+      <tr>
+        <th>Студент</th>
+        <th>Баллы</th>
+        <th>Статус</th>
+        <th>Действия</th>
+      </tr>
+      </thead>
 
-<hr>
+      <tbody>
+      <tr th:each="r : ${results}">
+        <td th:text="${r.user.firstName + ' ' + r.user.lastName}"></td>
+        <td th:text="${r.score}"></td>
+        <td>
+          <span class="badge"
+                th:classappend="${r.status.name() == 'CHECKED'} ? 'bg-success' : 'bg-warning text-dark'"
+                th:text="${r.status.name() == 'CHECKED'} ? 'Проверено' : 'Ожидает проверки'"></span>
+        </td>
 
-<table>
-  <thead>
-  <tr>
-    <th>Студент</th>
-    <th>Баллы</th>
-    <th>Статус</th>
-    <th>Действия</th>
-  </tr>
-  </thead>
+        <td>
+          <a class="btn btn-outline-primary btn-sm" th:if="${r.status.name() == 'WAITING'}"
+             th:href="@{'/teacher/results/check/' + ${r.id}}">Проверить</a>
 
-  <tbody>
-  <tr th:each="r : ${results}">
-    <td th:text="${r.user.firstName + ' ' + r.user.lastName}"></td>
-    <td th:text="${r.score}"></td>
-    <td th:text="${r.status}"></td>
+          <a class="btn btn-outline-secondary btn-sm" th:if="${r.status.name() == 'CHECKED'}"
+             th:href="@{'/teacher/results/' + ${r.id}}">Просмотр</a>
+        </td>
+      </tr>
 
-    <td>
-      <a th:if="${r.status.name() == 'WAITING'}"
-         th:href="@{'/teacher/results/check/' + ${r.id}}">Проверить</a>
+      <tr th:if="${results.size() == 0}">
+        <td colspan="4" class="text-center text-muted">Нет результатов</td>
+      </tr>
 
-      <a th:if="${r.status.name() == 'CHECKED'}"
-         th:href="@{'/teacher/results/' + ${r.id}}">Просмотр</a>
-    </td>
-  </tr>
+      </tbody>
+    </table>
+  </div>
+</main>
 
-  <tr th:if="${results.size() == 0}">
-    <td>Нет результатов</td>
-  </tr>
-
-  </tbody>
-</table>
-
+<div th:replace="~{fragments :: footer}"></div>
 </body>
 </html>

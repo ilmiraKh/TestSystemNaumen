@@ -1,6 +1,9 @@
 package ru.khamitova.TestSystemNaumen.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import ru.khamitova.TestSystemNaumen.entity.enums.QuestionType;
@@ -17,6 +20,7 @@ public class Question {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "{question.text.required}")
     @Column(nullable = false, columnDefinition = "TEXT")
     private String text;
 
@@ -24,6 +28,8 @@ public class Question {
     @Enumerated(EnumType.STRING)
     private QuestionType type;
 
+    @NotNull(message = "{question.points.required}")
+    @Min(value = 1, message = "{question.points.positive}")
     @Column(nullable = false)
     private Integer points;
 
@@ -49,6 +55,6 @@ public class Question {
     @Transient
     public int getCorrectCount() {
         if (options == null) return 0;
-        return (int) options.stream().filter(Option::getIsCorrect).count();
+        return (int) options.stream().filter(o -> Boolean.TRUE.equals(o.getIsCorrect())).count();
     }
 }

@@ -89,15 +89,25 @@ public class TeacherQuestionViewController {
                                  @PathVariable Long id,
                                  @Valid @ModelAttribute("question") Question question,
                                  BindingResult result,
-                                 Principal principal) {
+                                 Principal principal,
+                                 Model model) {
         User teacher = userService.findByEmail(principal.getName());
         question.setId(id);
+
+        Test test = testService.findByIdAndUser(testId, teacher);
+        question.setTest(test);
 
         if (result.hasErrors()) {
             return "question_form";
         }
 
-        questionService.update(question, teacher);
+        try {
+            questionService.update(question, teacher);
+        } catch (IllegalArgumentException ex) {
+            result.rejectValue("options", ex.getMessage());
+            model.addAttribute("question", question);
+            return "question_form";
+        }
 
         return "redirect:/teacher/tests/" + testId + "/questions";
     }

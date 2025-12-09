@@ -60,7 +60,7 @@ public class TeacherResultViewController {
                 ));
 
         resultService.manualCheck(id, points);
-        return "redirect:/teacher/results";
+        return "redirect:/teacher/results/" + id;
     }
 
     @GetMapping("/test/{testId}")

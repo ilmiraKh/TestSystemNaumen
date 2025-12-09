@@ -1,39 +1,48 @@
 <!DOCTYPE html>
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Вход</title>
-</head>
-<body>
-<h2>Вход</h2>
+<head th:replace="~{fragments :: head('Вход')}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments :: header}"></div>
 
-<div th:if="${param.error}" style="color:red;">
-    <p>Неверный email или пароль</p>
-</div>
+<main class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h2 class="card-title h4 mb-4 text-center">Вход</h2>
 
-<div th:if="${param.logout}">
-    <p>Вы успешно вышли из системы</p>
-</div>
+                    <div th:if="${param.error}" class="alert alert-danger">
+                        Неверный email или пароль
+                    </div>
 
-<form th:action="@{/login}" method="post">
-    <div>
-        <label>Email:
-            <input type="email" name="username" required>
-        </label>
+                    <div th:if="${param.logout}" class="alert alert-success">
+                        Вы успешно вышли из системы
+                    </div>
+
+                    <form th:action="@{/login}" method="post" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="username" class="form-control" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Пароль</label>
+                            <input type="password" name="password" class="form-control" required>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Войти</button>
+                        </div>
+                    </form>
+                    <p class="mt-3 mb-0 text-center">
+                        Нет аккаунта? <a th:href="@{/registration}">Зарегистрироваться</a>
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
+</main>
 
-    <div>
-        <label>Пароль:
-            <input type="password" name="password" required>
-        </label>
-    </div>
-
-    <button type="submit">Войти</button>
-</form>
-
-<div>
-    <p>Нет аккаунта? <a th:href="@{/registration}">Зарегистрироваться</a></p>
-</div>
-
+<div th:replace="~{fragments :: footer}"></div>
 </body>
 </html>

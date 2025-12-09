@@ -1,82 +1,86 @@
 <!DOCTYPE html>
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title th:text="${test.title}">Тест</title>
-</head>
-<body>
+<head th:replace="~{fragments :: head('Тест: ' + ${test.title})}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments :: header}"></div>
 
-<h2 th:text="'Тест: ' + ${test.title}"></h2>
-
-<p><b>Описание:</b> <span th:text="${test.description}"></span></p>
-
-<div th:if="${test.published}">
-    <p>Тест опубликован</p>
-</div>
-
-<a th:href="@{|/teacher/tests/edit/${test.id}|}"
-   th:if="${!test.published}">Редактировать метаданные</a>
-
-<hr>
-
-<h3>Вопросы</h3>
-
-<div th:if="${#lists.isEmpty(questions)}">
-    <p>Вопросов пока нет.</p>
-    <hr>
-</div>
-
-<div th:each="q : ${questions}">
-    <h4 th:text="${q.text}"></h4>
-
-    <p>Баллы: <span th:text="${q.points}"></span></p>
-
-    <ul th:if="${q.type.name() == 'CHOICE'}">
-        <li th:each="opt : ${q.options}">
-            <span th:text="${opt.text}"></span>
-            <b th:if="${opt.isCorrect}" style="color: green"> - правильный</b>
-        </li>
-    </ul>
-
-    <div th:if="${q.type.name() == 'OPEN'}">
-        <p><b>Открытый вопрос</b></p>
-        <p th:if="${q.manualCheckRequired}">Требует ручной проверки</p>
-        <p th:if="${q.correctAnswer != null and q.correctAnswer != ''}" style="color: green">
-            <b>Правильный ответ: <span th:text="${q.correctAnswer}"></span></b>
-        </p>
+<main class="container py-4">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-3">
+        <div>
+            <h2 class="mb-1" th:text="'Тест: ' + ${test.title}"></h2>
+            <p class="text-muted mb-0"><b>Описание:</b> <span
+                    th:text="${test.description != null and !#strings.isEmpty(test.description)
+                    ? test.description
+                    : 'Нет описания'}">></span></p>
+        </div>
+        <div class="d-flex gap-2 mt-3 mt-md-0">
+            <a class="btn btn-outline-secondary" th:href="@{'/teacher/tests'}">Назад к своим тестам</a>
+            <a class="btn btn-outline-primary" th:href="@{|/teacher/tests/edit/${test.id}|}"
+               th:if="${!test.published}">Редактировать метаданные</a>
+        </div>
     </div>
 
-    <div th:if="${!test.published}">
-        <a th:href="@{'/teacher/tests/' + ${test.id} + '/questions/edit/' + ${q.id}}">
-            Редактировать
-        </a>
+    <div th:if="${test.published}" class="alert alert-success">
+        Тест опубликован
+    </div>
 
-        <form th:action="@{'/teacher/tests/' + ${test.id} + '/questions/delete/' + ${q.id}}"
-              method="post"
-              style="display:inline">
-            <button type="submit" onclick="return confirm('Удалить вопрос?')">Удалить</button>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="h5 mb-0">Вопросы</h3>
+        <a class="btn btn-success btn-sm" th:href="@{'/teacher/tests/' + ${test.id} + '/questions/create'}"
+           th:if="${!test.published}">
+            <i class="bi bi-plus-lg me-1"></i>Добавить вопрос
+        </a>
+    </div>
+
+    <div th:if="${#lists.isEmpty(questions)}" class="alert alert-info">
+        Вопросов пока нет.
+    </div>
+
+    <div class="list-group" th:if="${!#lists.isEmpty(questions)}">
+        <div class="list-group-item" th:each="q : ${questions}">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h4 class="h6 mb-2" th:text="${q.text}"></h4>
+                    <p class="mb-2 text-muted">Баллы: <span th:text="${q.points}"></span></p>
+                </div>
+                <div th:if="${!test.published}" class="ms-2">
+                    <a class="btn btn-outline-primary btn-sm"
+                       th:href="@{'/teacher/tests/' + ${test.id} + '/questions/edit/' + ${q.id}}">
+                        Редактировать
+                    </a>
+                    <form th:action="@{'/teacher/tests/' + ${test.id} + '/questions/delete/' + ${q.id}}"
+                          method="post" class="d-inline"
+                          onsubmit="return confirm('Удалить вопрос?')">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Удалить</button>
+                    </form>
+                </div>
+            </div>
+
+            <ul class="mb-2" th:if="${q.type.name() == 'CHOICE'}">
+                <li th:each="opt : ${q.options}">
+                    <span th:text="${opt.text}"></span>
+                    <span class="badge bg-success ms-1" th:if="${opt.isCorrect}">правильный</span>
+                </li>
+            </ul>
+
+            <div th:if="${q.type.name() == 'OPEN'}">
+                <p class="mb-1"><b>Открытый вопрос</b></p>
+                <p class="mb-1 text-muted" th:if="${q.manualCheckRequired}">Требует ручной проверки</p>
+                <p class="mb-1 text-success fw-semibold" th:if="${q.correctAnswer != null and q.correctAnswer != ''}">
+                    Правильный ответ: <span th:text="${q.correctAnswer}"></span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4" th:if="${!test.published}">
+        <form th:action="@{'/teacher/tests/publish/' + ${test.id}}" method="post"
+              onsubmit="return confirm('Опубликовать тест? После публикации редактирование вопросов будет недоступно.');">
+            <button type="submit" class="btn btn-primary">Опубликовать тест</button>
         </form>
     </div>
+</main>
 
-    <hr>
-</div>
-
-<div th:if="${!test.published}">
-    <a th:href="@{'/teacher/tests/' + ${test.id} + '/questions/create'}">
-        Добавить вопрос
-    </a>
-</div>
-
-<div th:if="${!test.published}">
-    <form th:action="@{'/teacher/tests/publish/' + ${test.id}}" method="post">
-        <button type="submit" onclick="return confirm('Опубликовать тест? После публикации редактирование вопросов будет недоступно.')">
-            Опубликовать тест
-        </button>
-    </form>
-</div>
-
-<br>
-<a th:href="@{'/teacher/tests'}">Назад к тестам</a>
-
+<div th:replace="~{fragments :: footer}"></div>
 </body>
 </html>

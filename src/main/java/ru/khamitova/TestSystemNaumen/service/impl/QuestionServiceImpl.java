@@ -3,6 +3,7 @@ package ru.khamitova.TestSystemNaumen.service.impl;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.khamitova.TestSystemNaumen.entity.Option;
 import ru.khamitova.TestSystemNaumen.entity.Question;
 import ru.khamitova.TestSystemNaumen.entity.Test;
@@ -40,6 +41,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
+    @Transactional
     public Question create(Question question, User user) {
         if (!question.getTest().getUser().getId().equals(user.getId())) {
             throw new EntityNotFoundException("test.notFound");
@@ -50,12 +52,16 @@ public class QuestionServiceImpl implements QuestionService {
         manualCheckRequired(question);
 
         validateOptions(question);
-        question.getOptions().forEach(option -> option.setQuestion(question));
+        question.getOptions().forEach(option -> {
+            option.setQuestion(question);
+            if (option.getIsCorrect() == null) option.setIsCorrect(false);
+        });
 
         return questionRepository.save(question);
     }
 
     @Override
+    @Transactional
     public Question update(Question question, User user) {
         Question existing = questionRepository.findById(question.getId())
                 .orElseThrow(() -> new EntityNotFoundException("question.notFound"));
@@ -93,6 +99,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
+    @Transactional
     public void deleteByIdAndUser(Long id, User user) {
         Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("question.notFound"));
@@ -138,7 +145,7 @@ public class QuestionServiceImpl implements QuestionService {
                 throw new IllegalArgumentException("question.atLeastOneOptionRequired");
             }
 
-            boolean hasCorrect = validOptions.stream().anyMatch(Option::getIsCorrect);
+            boolean hasCorrect = validOptions.stream().anyMatch(o -> Boolean.TRUE.equals(o.getIsCorrect()));
 
             if (!hasCorrect) {
                 throw new IllegalArgumentException("question.atLeastOneCorrectRequired");

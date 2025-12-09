@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.khamitova.TestSystemNaumen.entity.Topic;
 import ru.khamitova.TestSystemNaumen.exception.EntityAlreadyExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -64,6 +65,7 @@ public class TopicServiceImpl implements TopicService {
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         Topic topic = topicRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("topic.notFound"));

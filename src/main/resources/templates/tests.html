@@ -1,101 +1,108 @@
 <!DOCTYPE html>
 <html lang="ru" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-    <meta charset="UTF-8">
-    <title>Тесты</title>
-</head>
-<body>
+<head th:replace="~{fragments :: head('Тесты')}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments :: header}"></div>
 
-<h2>Список тестов</h2>
-
-<div th:if="${topicId != null and topicName != null and !#strings.isEmpty(topicName)}">
-    Вы просматриваете только тесты по теме <strong th:text="${topicName}"></strong>.
-    <div>
-    <a th:if="${search != null}" th:href="@{|/tests?search=${search}|}">
-        Очистить поиск по теме и перейти ко всем тестам
-    </a>
-    <a th:if="${search == null}" th:href="@{|/tests|}">
-        Очистить поиск по теме и перейти ко всем тестам
-    </a>
-    </div>
-</div>
-<form method="get" action="#">
-    <input type="text" name="search" placeholder="Поиск по названию теста" th:value="${search}">
-    <input type="text" name="topicName" placeholder="Поиск по теме"
-           th:value="${topicName}" th:if="${topicId == null}">
-    <input type="hidden" name="topicId" th:if="${topicId != null}" th:value="${topicId}">
-
-    <button type="submit">Найти</button>
-
-</form>
-
-<div th:if="${#lists.isEmpty(tests)}">
-    <p>Тесты не найдены.</p>
-</div>
-
-<div th:each="test : ${tests}">
-
-    <h3 th:text="${test.title}"></h3>
-
-    <p>
-        Тема: <a th:href="@{|/tests?topicId=${test.topic.id}|}" th:text="${test.topic.name}"></a>
-    </p>
-
-    <p th:text="${test.description != null && !#strings.isEmpty(test.description)
-                ? test.description : 'нет описания'}"></p>
-
-    <div sec:authorize="hasRole('STUDENT')">
-        <a th:href="@{|/student/tests/take/${test.id}|}">Пройти тест</a>
+<main class="container py-4">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-3">
+        <h2 class="mb-3 mb-md-0">Список тестов</h2>
+        <a class="btn btn-outline-secondary" th:href="@{/tests}" th:if="${topicId != null or search != null}">
+            Сбросить фильтры
+        </a>
     </div>
 
-    <div sec:authorize="hasRole('TEACHER')">
-
-        <form th:action="@{|/teacher/tests/delete/${test.id}|}" method="post" style="display:inline;">
-            <button type="submit"
-                    onclick="return confirm('Удалить тест?');">
-                Удалить
-            </button>
-        </form>
+    <div th:if="${topicId != null and topicName != null and !#strings.isEmpty(topicName)}"
+         class="alert alert-secondary">
+        Вы просматриваете только тесты по теме <strong th:text="${topicName}"></strong>.
     </div>
-</div>
 
-<div th:if="${totalPages == 1}">
-    <span>Страница 1 из 1</span>
-</div>
+    <form method="get" action="#" class="row gy-2 gx-3 align-items-center mb-4">
+        <div class="col-md-4">
+            <input type="text" name="search" class="form-control" placeholder="Поиск по названию теста" th:value="${search}">
+        </div>
+        <div class="col-md-4" th:if="${topicId == null}">
+            <input type="text" name="topicName" class="form-control" placeholder="Поиск по теме"
+                   th:value="${topicName}">
+        </div>
+        <input type="hidden" name="topicId" th:if="${topicId != null}" th:value="${topicId}">
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Найти</button>
+        </div>
+    </form>
 
-<div th:if="${totalPages > 1}">
+    <div th:if="${#lists.isEmpty(tests)}" class="alert alert-info">
+        Тесты не найдены.
+    </div>
 
-    <a th:if="${currentPage != 1}"
-       th:href="@{|/tests?page=1&search=${search}&topicId=${topicId}&topicName=${topicName}|}">1</a>
-    <span th:if="${currentPage == 1}">1</span>
+    <div class="row row-cols-1 row-cols-md-2 g-4" th:if="${!#lists.isEmpty(tests)}">
+        <div class="col" th:each="test : ${tests}">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h3 class="h5" th:text="${test.title}"></h3>
+                    <p class="mb-2 text-muted">
+                        Тема:
+                        <a th:href="@{|/tests?topicId=${test.topic.id}|}" th:text="${test.topic.name}"></a>
+                    </p>
+                    <p class="flex-grow-1"
+                       th:text="${test.description != null && !#strings.isEmpty(test.description) ? test.description : 'Нет описания'}"></p>
 
-    <span th:if="${currentPage > 4}">...</span>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div sec:authorize="hasRole('STUDENT')">
+                            <a class="btn btn-primary btn-sm" th:href="@{|/student/tests/take/${test.id}|}">
+                                Пройти тест
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <span th:each="i : ${#numbers.sequence(currentPage-2, currentPage-1)}"
-          th:if="${i > 1}">
-        <a th:if="${i != currentPage}"
-           th:href="@{|/tests?page=${i}&search=${search}&topicId=${topicId}&topicName=${topicName}|}"
-           th:text="${i}"></a>
-    </span>
+    <nav class="mt-4" th:if="${totalPages > 1}">
+        <ul class="pagination">
+            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/tests(page=1, search=${search}, topicId=${topicId}, topicName=${topicName})}">1</a>
+            </li>
 
-    <span th:if="${currentPage != 1 and currentPage != totalPages}"
-          th:text="${currentPage}"></span>
+            <li class="page-item disabled" th:if="${currentPage > 4}">
+                <span class="page-link">...</span>
+            </li>
 
-    <span th:each="i : ${#numbers.sequence(currentPage+1, currentPage+2)}"
-          th:if="${i < totalPages}">
-        <a th:href="@{|/tests?page=${i}&search=${search}&topicId=${topicId}&topicName=${topicName}|}"
-           th:text="${i}"></a>
-    </span>
+            <li class="page-item" th:each="i : ${#numbers.sequence(currentPage-2, currentPage-1)}"
+                th:if="${i > 1}" th:classappend="${i == currentPage} ? 'active'">
+                <a class="page-link"
+                   th:href="@{/tests(page=${i}, search=${search}, topicId=${topicId}, topicName=${topicName})}"
+                   th:text="${i}"></a>
+            </li>
 
-    <span th:if="${currentPage < totalPages-3}">...</span>
+            <li class="page-item active" th:if="${currentPage != 1 and currentPage != totalPages}">
+                <span class="page-link" th:text="${currentPage}"></span>
+            </li>
 
-    <a th:if="${currentPage != totalPages}"
-       th:href="@{|/tests?page=${totalPages}&search=${search}&topicId=${topicId}&topicName=${topicName}|}"
-       th:text="${totalPages}"></a>
-    <span th:if="${currentPage == totalPages}"
-          th:text="${totalPages}"></span>
-</div>
+            <li class="page-item" th:each="i : ${#numbers.sequence(currentPage+1, currentPage+2)}"
+                th:if="${i < totalPages}" th:classappend="${i == currentPage} ? 'active'">
+                <a class="page-link"
+                   th:href="@{/tests(page=${i}, search=${search}, topicId=${topicId}, topicName=${topicName})}"
+                   th:text="${i}"></a>
+            </li>
 
+            <li class="page-item disabled" th:if="${currentPage < totalPages-3}">
+                <span class="page-link">...</span>
+            </li>
+
+            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'active'">
+                <a class="page-link"
+                   th:href="@{/tests(page=${totalPages}, search=${search}, topicId=${topicId}, topicName=${topicName})}"
+                   th:text="${totalPages}"></a>
+            </li>
+        </ul>
+    </nav>
+
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
 </body>
 </html>

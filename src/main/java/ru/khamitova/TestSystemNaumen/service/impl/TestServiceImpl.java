@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.khamitova.TestSystemNaumen.entity.Test;
 import ru.khamitova.TestSystemNaumen.entity.User;
 import jakarta.persistence.EntityNotFoundException;
@@ -62,6 +63,7 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
+    @Transactional
     public void deleteByIdAndUser(Long id, User user) {
         Test test = testRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new EntityNotFoundException("test.notFound"));

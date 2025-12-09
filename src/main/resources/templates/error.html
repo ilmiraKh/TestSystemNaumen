@@ -1,19 +1,30 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Упс :(</title>
-</head>
-<body>
-<h1>Произошла ошибка</h1>
-<p>Что-то пошло не так.</p>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Упс...')}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments :: header}"></div>
 
-<p th:if="${status}">
-    Код ошибки: <b th:text="${status}"></b>
-</p>
+<main class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <div class="display-6 mb-3">Упс :(</div>
+                    <p class="lead">Что-то пошло не так.</p>
 
-<p th:if="${error}">
-    <span th:text="${error}"></span>
-</p>
+                    <p th:if="${status}" class="mb-1">
+                        Код ошибки: <span class="fw-semibold" th:text="${status}"></span>
+                    </p>
+
+                    <p th:if="${error}" class="text-muted" th:text="${error}"></p>
+
+                    <a class="btn btn-primary mt-3" th:href="@{/topics}">На главную</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
 </body>
 </html>

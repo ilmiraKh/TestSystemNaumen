@@ -1,125 +1,126 @@
 <!DOCTYPE html>
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title th:text="${question.id != null} ? 'Редактирование вопроса' : 'Создание вопроса'">Вопрос</title>
+<head th:replace="~{fragments :: head('Вопрос')}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments :: header}"></div>
 
-    <script>
-        function updateVisibility() {
-            const type = document.getElementById("typeSelector").value;
-            document.getElementById("optionsBlock").style.display = (type === 'CHOICE') ? 'block' : 'none';
-            document.getElementById("openBlock").style.display = (type === 'OPEN') ? 'block' : 'none';
-        }
+<main class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-9 col-xl-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h2 class="card-title h4 mb-4"
+                        th:text="${question.id != null} ? 'Редактирование вопроса' : 'Создание вопроса'"></h2>
 
-        function addOption() {
-            const container = document.getElementById("optionsContainer");
+                    <form th:action="@{${question.id != null}
+                            ? '/teacher/tests/' + ${question.test.id} + '/questions/edit/' + ${question.id}
+                            : '/teacher/tests/' + ${question.test.id} + '/questions/create'}"
+                          th:object="${question}"
+                          method="post"
+                          class="needs-validation" novalidate>
 
-            const div = document.createElement("div");
-            div.classList.add("option-item");
+                        <div class="mb-3">
+                            <label class="form-label">Текст вопроса</label>
+                            <textarea th:field="*{text}" class="form-control" rows="3" required></textarea>
+                            <div class="text-danger small" th:if="${#fields.hasErrors('text')}" th:errors="*{text}"></div>
+                        </div>
 
-            div.innerHTML = `
-            <label>
-                <input type="checkbox" name="options[].isCorrect">
-                <input type="text" name="options[].text" placeholder="Текст варианта">
-                <button type="button" onclick="removeOption(this)">Удалить</button>
-            </label>
-        `;
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Тип вопроса</label>
+                                <select id="typeSelector" th:field="*{type}" class="form-select" onchange="updateVisibility()" required>
+                                    <option value="" disabled selected>Выберите тип</option>
+                                    <option value="CHOICE">С выбором ответов</option>
+                                    <option value="OPEN">Открытый ответ</option>
+                                </select>
+                                <div class="text-danger small" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Баллы</label>
+                                <input type="number" th:field="*{points}" min="1" class="form-control" required>
+                                <div class="text-danger small" th:if="${#fields.hasErrors('points')}" th:errors="*{points}"></div>
+                            </div>
+                        </div>
 
-            container.appendChild(div);
-            normalizeOptionIndexes();
-        }
+                        <div id="optionsBlock" style="display:none;" class="mt-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h3 class="h5 mb-0">Варианты ответов</h3>
+                                <button type="button" class="btn btn-outline-success btn-sm" onclick="addOption()">Добавить вариант</button>
+                            </div>
 
-        function removeOption(button) {
-            const item = button.closest(".option-item");
-            item.remove();
-            normalizeOptionIndexes();
-        }
+                            <div id="optionsContainer" class="mt-2">
+                                <div th:each="option, iterStat : ${question.options}" class="option-item border rounded p-3 mb-2">
+                                    <div class="form-check d-flex align-items-center gap-2">
+                                        <input class="form-check-input mt-0" type="checkbox" th:field="*{options[__${iterStat.index}__].isCorrect}">
+                                        <input class="form-control" type="text" th:field="*{options[__${iterStat.index}__].text}" placeholder="Текст варианта">
+                                        <button class="btn btn-outline-danger btn-sm" type="button" onclick="removeOption(this)">Удалить</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-danger small" th:if="${#fields.hasErrors('options')}" th:errors="*{options}"></div>
+                        </div>
 
-        function normalizeOptionIndexes() {
-            const container = document.getElementById("optionsContainer");
-            const items = container.querySelectorAll(".option-item");
+                        <div id="openBlock" style="display:none;" class="mt-4">
+                            <h3 class="h5">Открытый вопрос</h3>
+                            <label class="form-label">Правильный ответ (необязательно, оставьте поле пустым, если вопрос требует ручной проверки):</label>
+                            <input type="text" th:field="*{correctAnswer}" class="form-control">
+                        </div>
 
-            items.forEach((item, index) => {
-                const check = item.querySelector('input[type="checkbox"]');
-                const text = item.querySelector('input[type="text"]');
-
-                check.name = `options[${index}].isCorrect`;
-                text.name = `options[${index}].text`;
-            });
-        }
-
-        document.addEventListener("DOMContentLoaded", updateVisibility);
-    </script>
-
-</head>
-<body>
-
-<h2 th:text="${question.id != null} ? 'Редактирование вопроса' : 'Создание вопроса'"></h2>
-
-<form th:action="@{${question.id != null}
-        ? '/teacher/tests/' + ${question.test.id} + '/questions/edit/' + ${question.id}
-        : '/teacher/tests/' + ${question.test.id} + '/questions/create'}"
-      th:object="${question}"
-      method="post">
-
-    <div>
-        <label>Текст вопроса:
-            <textarea th:field="*{text}" required></textarea>
-        </label>
-        <p th:if="${#fields.hasErrors('text')}" th:errors="*{text}"></p>
-    </div>
-
-    <div>
-        <label>Тип вопроса:
-            <select id="typeSelector" th:field="*{type}" onchange="updateVisibility()" required>
-                <option value="" disabled selected>Выберите тип</option>
-                <option value="CHOICE">С выбором ответов</option>
-                <option value="OPEN">Открытый ответ</option>
-            </select>
-        </label>
-        <p th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></p>
-    </div>
-
-    <div>
-        <label>Баллы:
-            <input type="number" th:field="*{points}" min="1" required>
-        </label>
-        <p th:if="${#fields.hasErrors('points')}" th:errors="*{points}"></p>
-    </div>
-
-    <div id="optionsBlock" style="display:none;">
-        <h3>Варианты ответов</h3>
-
-        <div id="optionsContainer">
-
-            <div th:each="option, iterStat : ${question.options}" class="option-item">
-                <label>
-                    <input type="checkbox" th:field="*{options[__${iterStat.index}__].isCorrect}">
-                    <input type="text" th:field="*{options[__${iterStat.index}__].text}" placeholder="Текст варианта">
-                    <button type="button" onclick="removeOption(this)">Удалить</button>
-                </label>
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary">Сохранить</button>
+                            <a class="btn btn-outline-secondary" th:href="@{|/teacher/tests/${question.test.id}/questions|}">Назад</a>
+                        </div>
+                    </form>
+                </div>
             </div>
-
         </div>
-        <p th:if="${#fields.hasErrors('options')}" th:errors="*{options}"></p>
-
-        <button type="button" onclick="addOption()">Добавить вариант</button>
     </div>
+</main>
 
+<script>
+    function updateVisibility() {
+        const type = document.getElementById("typeSelector").value;
+        document.getElementById("optionsBlock").style.display = (type === 'CHOICE') ? 'block' : 'none';
+        document.getElementById("openBlock").style.display = (type === 'OPEN') ? 'block' : 'none';
+    }
 
-    <div id="openBlock" style="display:none;">
-        <h3>Открытый вопрос</h3>
+    function addOption() {
+        const container = document.getElementById("optionsContainer");
+        const div = document.createElement("div");
+        div.classList.add("option-item", "border", "rounded", "p-3", "mb-2");
+        div.innerHTML = `
+            <div class="form-check d-flex align-items-center gap-2">
+                <input class="form-check-input mt-0" type="checkbox" name="options[].isCorrect">
+                <input class="form-control" type="text" name="options[].text" placeholder="Текст варианта">
+                <button class="btn btn-outline-danger btn-sm" type="button" onclick="removeOption(this)">Удалить</button>
+            </div>
+        `;
+        container.appendChild(div);
+        normalizeOptionIndexes();
+    }
 
-        <label>Правильный ответ (необязательно, оставьте поле пустым, если вопрос требует ручной проверки):
-            <input type="text" th:field="*{correctAnswer}">
-        </label>
-    </div>
+    function removeOption(button) {
+        const item = button.closest(".option-item");
+        item.remove();
+        normalizeOptionIndexes();
+    }
 
-    <br><br>
-    <button type="submit">Сохранить</button>
-</form>
+    function normalizeOptionIndexes() {
+        const container = document.getElementById("optionsContainer");
+        const items = container.querySelectorAll(".option-item");
 
-<a th:href="@{|/teacher/tests/${question.test.id}/questions|}">Назад</a>
+        items.forEach((item, index) => {
+            const check = item.querySelector('input[type="checkbox"]');
+            const text = item.querySelector('input[type="text"]');
 
+            check.name = `options[${index}].isCorrect`;
+            text.name = `options[${index}].text`;
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", updateVisibility);
+</script>
+
+<div th:replace="~{fragments :: footer}"></div>
 </body>
 </html>

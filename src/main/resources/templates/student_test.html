@@ -1,44 +1,50 @@
 <!DOCTYPE html>
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title th:text="${test.title}">Тест</title>
-</head>
-<body>
-<h2 th:text="'Тест: ' + ${test.title}"></h2>
-<form th:action="@{|/student/tests/submit/${test.id}|}" method="post">
+<head th:replace="~{fragments :: head('Тест: ' + ${test.title})}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments :: header}"></div>
 
-    <div th:each="question : ${test.questions}">
-        <p th:text="${question.text}"></p>
+<main class="container py-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <h2 class="card-title h4 mb-4" th:text="'Тест: ' + ${test.title}"></h2>
+            <form th:action="@{|/student/tests/submit/${test.id}|}" method="post" class="vstack gap-4">
 
-        <div th:if="${question.type.name() == 'CHOICE'}">
-            <div th:if="${question.correctCount == 1}">
-                <div th:each="option : ${question.options}">
-                    <input type="radio"
-                           th:name="'question_' + ${question.id}"
-                           th:value="${option.id}">
-                    <span th:text="${option.text}"></span>
+                <div class="border rounded p-3 bg-white" th:each="question : ${test.questions}">
+                    <p class="fw-semibold" th:text="${question.text}"></p>
+
+                    <div th:if="${question.type.name() == 'CHOICE'}" class="ms-2">
+                        <div class="form-check" th:if="${question.correctCount == 1}" th:each="option : ${question.options}">
+                            <input class="form-check-input" type="radio"
+                                   th:name="'question_' + ${question.id}"
+                                   th:value="${option.id}"
+                                   required>
+                            <label class="form-check-label" th:text="${option.text}"></label>
+                        </div>
+
+                        <div th:if="${question.correctCount > 1}">
+                            <div class="form-check" th:each="option : ${question.options}">
+                                <input class="form-check-input" type="checkbox"
+                                       th:name="'question_' + ${question.id}"
+                                       th:value="${option.id}">
+                                <label class="form-check-label" th:text="${option.text}"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div th:if="${question.type.name() == 'OPEN'}">
+                        <textarea class="form-control" th:name="'question_' + ${question.id}" rows="3"></textarea>
+                    </div>
                 </div>
-            </div>
 
-            <div th:if="${question.correctCount > 1}">
-                <div th:each="option : ${question.options}">
-                    <input type="checkbox"
-                           th:name="'question_' + ${question.id}"
-                           th:value="${option.id}">
-                    <span th:text="${option.text}"></span>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">Отправить тест</button>
                 </div>
-            </div>
+            </form>
         </div>
-
-        <div th:if="${question.type.name() == 'OPEN'}">
-            <textarea th:name="'question_' + ${question.id}" rows="3" cols="50"></textarea>
-        </div>
-
     </div>
+</main>
 
-    <button type="submit">Отправить тест</button>
-</form>
-
+<div th:replace="~{fragments :: footer}"></div>
 </body>
 </html>

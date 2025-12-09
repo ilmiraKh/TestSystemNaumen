@@ -1,38 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title th:text="${test.id != null} ? ${test.title} : 'Новый тест'">Тест</title>
-</head>
-<body>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Тест')}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments :: header}"></div>
 
-<h2 th:text="${test.id == null} ? 'Создание теста' : 'Редактирование теста'"></h2>
+<main class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h2 class="card-title h4 mb-4"
+                        th:text="${test.id == null} ? 'Создание теста' : 'Редактирование теста'"></h2>
 
-<p><b>Тема:</b> <span th:text="${test.topic.name}"></span></p>
+                    <p class="text-muted mb-4"><b>Тема:</b> <span th:text="${test.topic.name}"></span></p>
 
-<form th:action="@{${test.id == null}
-                       ? '/teacher/tests/create/' + ${test.topic.id}
-                       : '/teacher/tests/edit/' + ${test.id}}"
-      method="post"
-      th:object="${test}">
+                    <form th:action="@{${test.id == null}
+                                           ? '/teacher/tests/create/' + ${test.topic.id}
+                                           : '/teacher/tests/edit/' + ${test.id}}"
+                          method="post"
+                          th:object="${test}" class="needs-validation" novalidate>
 
-    <div>
-    <label>Название:
-        <input type="text" th:field="*{title}">
-    </label>
-    <p th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></p>
+                        <div class="mb-3">
+                            <label class="form-label">Название</label>
+                            <input type="text" th:field="*{title}" class="form-control" required>
+                            <div class="text-danger small" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Описание</label>
+                            <textarea th:field="*{description}" class="form-control" rows="4"></textarea>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">Сохранить</button>
+                            <a class="btn btn-outline-secondary" th:href="@{/teacher/tests}">Назад к своим тестам</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+</main>
 
-    <div>
-    <label>Описание:
-        <textarea th:field="*{description}"></textarea>
-    </label>
-    </div>
-
-    <button type="submit">Сохранить</button>
-</form>
-
-<a th:href="@{/teacher/tests}">Назад</a>
-
+<div th:replace="~{fragments :: footer}"></div>
 </body>
 </html>
