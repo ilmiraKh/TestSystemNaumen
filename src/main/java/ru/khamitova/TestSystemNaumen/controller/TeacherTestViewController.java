@@ -119,12 +119,7 @@ public class TeacherTestViewController {
         User teacher = userService.findByEmail(principal.getName());
         Test test = testService.findByIdAndUser(id, teacher);
 
-        if (test.getPublished()) {
-            throw new IllegalStateException("test.alreadyPublished");
-        }
-
-        test.setPublished(true);
-        testService.update(test, teacher);
+        testService.publish(test, teacher);
 
         return "redirect:/teacher/tests/" + id + "/questions";
     }

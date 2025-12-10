@@ -11,6 +11,7 @@ import ru.khamitova.TestSystemNaumen.entity.User;
 import ru.khamitova.TestSystemNaumen.entity.enums.ResultStatus;
 import ru.khamitova.TestSystemNaumen.repository.ResultRepository;
 import ru.khamitova.TestSystemNaumen.service.TeacherResultService;
+import ru.khamitova.TestSystemNaumen.util.ResultUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -18,16 +19,20 @@ import java.util.Map;
 @Service
 public class TeacherResultServiceImpl implements TeacherResultService {
     private final ResultRepository resultRepository;
+    private final ResultUtil resultUtil;
 
     @Autowired
-    public TeacherResultServiceImpl(ResultRepository resultRepository) {
+    public TeacherResultServiceImpl(ResultRepository resultRepository, ResultUtil resultUtil) {
         this.resultRepository = resultRepository;
+        this.resultUtil = resultUtil;
     }
 
     @Override
     public Result getResultForTeacher(Long resultId, User teacher) {
-        return resultRepository.findByIdAndTest_User(resultId, teacher)
+        Result result = resultRepository.findByIdAndTest_User(resultId, teacher)
                 .orElseThrow(() -> new EntityNotFoundException("result.notFound"));
+        resultUtil.selectOptions(result);
+        return result;
     }
 
     @Override

@@ -12,7 +12,6 @@ import ru.khamitova.TestSystemNaumen.entity.enums.ResultStatus;
 import ru.khamitova.TestSystemNaumen.service.TeacherResultService;
 import ru.khamitova.TestSystemNaumen.service.TestService;
 import ru.khamitova.TestSystemNaumen.service.UserService;
-import ru.khamitova.TestSystemNaumen.util.ResultUtil;
 
 import java.security.Principal;
 import java.util.List;
@@ -98,7 +97,6 @@ public class TeacherResultViewController {
     public String getResultPage(@PathVariable Long id, Principal principal, Model model) {
         User teacher = userService.findByEmail(principal.getName());
         Result result = resultService.getResultForTeacher(id, teacher);
-        ResultUtil.selectOptions(result);
 
         model.addAttribute("result", result);
         return "result";

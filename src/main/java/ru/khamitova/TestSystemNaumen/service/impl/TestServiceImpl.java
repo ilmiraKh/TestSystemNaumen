@@ -76,4 +76,13 @@ public class TestServiceImpl implements TestService {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by("title"));
         return testRepository.findByFilters(topicId, topicName, search, pageable);
     }
+
+    public void publish(Test test, User teacher){
+        if (test.getPublished()) {
+            throw new IllegalStateException("test.alreadyPublished");
+        }
+
+        test.setPublished(true);
+        update(test, teacher);
+    }
 }

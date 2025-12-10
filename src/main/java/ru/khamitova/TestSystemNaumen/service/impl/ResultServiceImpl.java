@@ -10,6 +10,8 @@ import ru.khamitova.TestSystemNaumen.entity.enums.ResultStatus;
 import ru.khamitova.TestSystemNaumen.exception.EntityAlreadyExistsException;
 import ru.khamitova.TestSystemNaumen.repository.ResultRepository;
 import ru.khamitova.TestSystemNaumen.service.ResultService;
+import ru.khamitova.TestSystemNaumen.service.scoring.QuestionScoringStrategy;
+import ru.khamitova.TestSystemNaumen.util.ResultUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,15 +19,24 @@ import java.util.stream.Collectors;
 @Service
 public class ResultServiceImpl implements ResultService {
     private final ResultRepository resultRepository;
+    private final Map<QuestionType, QuestionScoringStrategy> scoringStrategies;
+    private final ResultUtil resultUtil;
 
     @Autowired
-    public ResultServiceImpl(ResultRepository resultRepository) {
+    public ResultServiceImpl(ResultRepository resultRepository,
+                             List<QuestionScoringStrategy> strategies,
+                             ResultUtil resultUtil) {
         this.resultRepository = resultRepository;
+        this.scoringStrategies = strategies.stream()
+                .collect(Collectors.toMap(QuestionScoringStrategy::getSupportedType, s -> s));
+        this.resultUtil = resultUtil;
     }
 
     @Override
     public Result findByIdAndUser(Long id, User student) {
-        return resultRepository.findByIdAndUser(id, student).orElseThrow(() -> new EntityNotFoundException("result.notFound"));
+        Result result = resultRepository.findByIdAndUser(id, student).orElseThrow(() -> new EntityNotFoundException("result.notFound"));
+        resultUtil.selectOptions(result);
+        return result;
     }
 
     @Override
@@ -62,16 +73,14 @@ public class ResultServiceImpl implements ResultService {
                 continue;
             }
 
-            switch (question.getType()) {
-                case OPEN -> {
-                    handleOpenQuestion(answer, question, rawValues[0]);
-                    if (!question.getManualCheckRequired()) {
-                        totalScore += answer.getPointsAwarded();
-                    }
-                }
-                case CHOICE -> {
-                    totalScore += handleChoiceQuestion(answer, question, rawValues);
-                }
+            QuestionScoringStrategy scoringStrategy = scoringStrategies.get(question.getType());
+            if (scoringStrategy == null) {
+                throw new IllegalStateException("question.unsupportedType");
+            }
+
+            double earnedPoints = scoringStrategy.score(question, rawValues, answer);
+            if (!question.getManualCheckRequired()) {
+                totalScore += earnedPoints;
             }
 
             answerList.add(answer);
@@ -82,41 +91,6 @@ public class ResultServiceImpl implements ResultService {
         result.setStatus(requiresManualCheck ? ResultStatus.WAITING : ResultStatus.CHECKED);
 
         return resultRepository.save(result);
-    }
-
-    private void handleOpenQuestion(Answer answer, Question question, String userAnswer) {
-        answer.setAnswer(userAnswer);
-
-        if (question.getManualCheckRequired()) {
-            answer.setPointsAwarded(null);
-            return;
-        }
-
-        boolean correct = question.getCorrectAnswer().trim().equalsIgnoreCase(userAnswer.trim());
-        answer.setPointsAwarded(correct ? question.getPoints().doubleValue() : 0.0);
-    }
-
-    private double handleChoiceQuestion(Answer answer, Question question, String[] rawValues) {
-        Set<Long> selectedOptionIds = Arrays.stream(rawValues)
-                .map(Long::valueOf)
-                .collect(Collectors.toSet());
-
-        answer.setAnswer(String.join(",", rawValues));
-
-        Set<Long> correctOptionIds = question.getOptions().stream()
-                .filter(Option::getIsCorrect)
-                .map(Option::getId)
-                .collect(Collectors.toSet());
-
-        long correctSelectedCount = selectedOptionIds.stream()
-                .filter(correctOptionIds::contains)
-                .count();
-
-        double pointsPerCorrect = question.getPoints().doubleValue() / correctOptionIds.size();
-        double earnedPoints = pointsPerCorrect * correctSelectedCount;
-
-        answer.setPointsAwarded(earnedPoints);
-        return earnedPoints;
     }
 
     @Override

@@ -14,4 +14,5 @@ public interface TestService {
     Test update(Test test, User user);
     void deleteByIdAndUser(Long id, User user);
     Page<Test> getPageByFilters(String search, Long topicId, String topicName, int page, int size);
+    void publish(Test test, User teacher);
 }

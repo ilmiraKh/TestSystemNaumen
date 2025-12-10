@@ -1,15 +1,22 @@
 package ru.khamitova.TestSystemNaumen.util;
 
+import org.springframework.stereotype.Component;
 import ru.khamitova.TestSystemNaumen.entity.Answer;
 import ru.khamitova.TestSystemNaumen.entity.Result;
+import ru.khamitova.TestSystemNaumen.entity.enums.QuestionType;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Component
 public class ResultUtil {
-    public static void selectOptions(Result result){
+    public void selectOptions(Result result){
+        if (result == null || result.getAnswers() == null) {
+            return;
+        }
+
         for (Answer answer : result.getAnswers()) {
             if (answer.getAnswer() != null && !answer.getAnswer().isBlank()) {
                 switch (answer.getQuestion().getType()){
