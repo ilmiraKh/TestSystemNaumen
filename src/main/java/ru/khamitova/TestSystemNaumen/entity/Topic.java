@@ -1,5 +1,6 @@
 package ru.khamitova.TestSystemNaumen.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -27,5 +28,6 @@ public class Topic {
 
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true,
             fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Test> tests;
 }

@@ -31,12 +31,12 @@ public class StudentTestViewController {
         this.userService = userService;
     }
 
-    @GetMapping("/take/{testId}")
-    public String takeTest(@PathVariable Long testId,
+    @GetMapping("/take/{id}")
+    public String takeTest(@PathVariable Long id,
                            Principal principal,
                            Model model,
                            RedirectAttributes redirectAttributes) {
-        Test test = testService.findById(testId);
+        Test test = testService.findById(id);
         User student = userService.findByEmail(principal.getName());
 
         Optional<Result> existingResult = resultService.checkExistingResult(test, student);

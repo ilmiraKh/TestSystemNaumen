@@ -11,12 +11,26 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.util.Locale;
 
 @ControllerAdvice
-public class ExceptionControllerAdvice {
+public class ExceptionViewControllerAdvice {
     private final MessageSource messageSource;
 
     @Autowired
-    public ExceptionControllerAdvice(MessageSource messageSource) {
+    public ExceptionViewControllerAdvice(MessageSource messageSource) {
         this.messageSource = messageSource;
+    }
+
+    private String buildErrorResponse(Exception ex, Model model, HttpServletResponse response, Locale locale, int status) {
+        String resolvedMessage = messageSource.getMessage(
+                ex.getMessage(),
+                new Object[]{},
+                ex.getMessage(),
+                locale
+        );
+
+        response.setStatus(status);
+        model.addAttribute("status", status);
+        model.addAttribute("error", resolvedMessage);
+        return "error";
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
@@ -24,18 +38,7 @@ public class ExceptionControllerAdvice {
                                  Model model,
                                  HttpServletResponse response,
                                  Locale locale) {
-        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-
-        String resolvedMessage = messageSource.getMessage(
-                ex.getMessage(),
-                new Object[]{},
-                ex.getMessage(),
-                locale
-        );
-
-        model.addAttribute("status", 404);
-        model.addAttribute("error", resolvedMessage);
-        return "error";
+        return buildErrorResponse(ex, model, response, locale, HttpServletResponse.SC_NOT_FOUND);
     }
 
     @ExceptionHandler(IllegalStateException.class)
@@ -43,18 +46,7 @@ public class ExceptionControllerAdvice {
                                      Model model,
                                      HttpServletResponse response,
                                      Locale locale) {
-        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-
-        String resolvedMessage = messageSource.getMessage(
-                ex.getMessage(),
-                new Object[]{},
-                ex.getMessage(),
-                locale
-        );
-
-        model.addAttribute("status", 400);
-        model.addAttribute("error", resolvedMessage);
-        return "error";
+        return buildErrorResponse(ex, model, response, locale, HttpServletResponse.SC_BAD_REQUEST);
     }
 
 }

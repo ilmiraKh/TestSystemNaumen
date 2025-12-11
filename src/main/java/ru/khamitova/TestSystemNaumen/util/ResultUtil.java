@@ -3,7 +3,6 @@ package ru.khamitova.TestSystemNaumen.util;
 import org.springframework.stereotype.Component;
 import ru.khamitova.TestSystemNaumen.entity.Answer;
 import ru.khamitova.TestSystemNaumen.entity.Result;
-import ru.khamitova.TestSystemNaumen.entity.enums.QuestionType;
 
 import java.util.Arrays;
 import java.util.Collections;
