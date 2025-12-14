@@ -47,7 +47,7 @@
                             Вопрос был проверен учителем
                         </p>
                         <p class="mb-0">Начислено баллов:
-                            <span th:text="${answer.pointsAwarded != null ? answer.pointsAwarded : 0}"></span>
+                            <span th:text="${#numbers.formatDecimal(answer.pointsAwarded, 1, 'POINT', 2, 'POINT')}"></span>
                         </p>
                     </div>
 
@@ -68,7 +68,7 @@
                         </ul>
 
                         <p class="mb-0">Начислено баллов:
-                            <span th:text="${answer.pointsAwarded != null ? answer.pointsAwarded : 0}"></span>
+                            <span th:text="${#numbers.formatDecimal(answer.pointsAwarded, 1, 'POINT', 2, 'POINT')}"></span>
                         </p>
                     </div>
                 </div>

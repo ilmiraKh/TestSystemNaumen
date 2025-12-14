@@ -31,7 +31,7 @@
             <tbody>
             <tr th:each="r : ${results}">
                 <td th:text="${r.test.title}"></td>
-                <td th:text="${r.score}"></td>
+                <td th:text="${#numbers.formatDecimal(r.score, 1, 'POINT', 2, 'POINT')}"></td>
                 <td>
                     <span class="badge"
                           th:classappend="${r.status.name() == 'CHECKED'} ? 'bg-success' : 'bg-warning text-dark'"

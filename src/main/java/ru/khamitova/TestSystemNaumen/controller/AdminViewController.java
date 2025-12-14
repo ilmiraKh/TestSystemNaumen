@@ -6,7 +6,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.khamitova.TestSystemNaumen.entity.Topic;
 import ru.khamitova.TestSystemNaumen.exception.EntityAlreadyExistsException;
 import ru.khamitova.TestSystemNaumen.service.TopicService;

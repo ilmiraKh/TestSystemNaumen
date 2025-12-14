@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ru.khamitova.TestSystemNaumen.entity.Topic;
 import ru.khamitova.TestSystemNaumen.service.TopicService;
 
-
 @Controller
 @RequestMapping("/topics")
 public class TopicViewController {
