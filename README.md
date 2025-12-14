@@ -42,6 +42,9 @@ ___
 - POST /admin/topics/edit/{id} – обновление темы по ID.
 - POST /admin/topics/delete/{id} – удаление темы по ID.
 
+Мониторинг для администратора:
+- GET /admin/monitoring - JavaMelody
+
 Управление тестами для преподавателя.
 - GET /teacher/tests – список созданных тестов.
 - GET /teacher/tests/create/{topicId} – форма создания теста по теме.
